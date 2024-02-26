@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt --user
+      
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Test application
+        run: |
+          echo "testing the flask application"
+          python3 test_app.py
+      
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Build Docker image
+        run: |
+          echo "building the docker image sne-project:latest"
+          docker build -t sneproject/sne-project:latest .
+      
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Login to Docker Hub
+        run: echo "bonjourvanel" | docker login -u "sneproject" --password-stdin
+      
+      - name: Push Docker image
+        run: |
+          echo "Pushing image to Docker Hub"
+          docker push sneproject/sne-project:latest
