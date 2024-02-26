@@ -1,5 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
 
 name: Python application
 
@@ -33,3 +32,19 @@ jobs:
       run: | 
        echo "testing the flask application"
        python3 test_app.py
+       
+    build-and-push-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      
+      - name: Log in to Docker Hub
+        run: echo "bonjourvanel" | docker login -u "sneproject" --password-stdin
+      
+      - name: Build and push Docker image
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 -t sneproject/Flask-app:latest . --push
