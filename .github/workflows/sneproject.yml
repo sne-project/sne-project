@@ -1,6 +1,6 @@
 
 
-name: Python application
+name: CI
 
 on:
   push:
