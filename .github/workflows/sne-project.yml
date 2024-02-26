@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches: 
+      - main
 
 permissions:
   contents: read
@@ -15,23 +17,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
    
-    - name:Test application
-      run: | 
-       echo "testing the flask application"
-       python3 test_app.py
-       
-    build-and-push-docker:
+      - name: Test application
+        run: | 
+          echo "testing the flask application"
+          python3 test_app.py
+          
+  build-and-push-docker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -41,8 +43,8 @@ jobs:
         uses: docker/setup-buildx-action@v1
       
       - name: Log in to Docker Hub
-        run: echo "bonjourvanel" | docker login -u "sneproject" --password-stdin
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
       
       - name: Build and push Docker image
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 -t sneproject/Flask-app:latest . --push
+          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKER_HUB_USERNAME }}/Flask-app:latest . --push
